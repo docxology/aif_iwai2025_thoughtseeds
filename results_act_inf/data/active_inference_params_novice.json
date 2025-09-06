@@ -10,7 +10,7 @@
   },
   "average_prediction_error_by_state": {
     "breath_control": 0.06675348683237259,
-    "mind_wandering": 0.025682699065912817,
+    "mind_wandering": 0.025682699065912813,
     "meta_awareness": 0.13261462789141737,
     "redirect_breath": 0.1282413715851457
   },
