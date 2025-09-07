@@ -76,6 +76,7 @@ def load_json_data(experience_level):
             for key, value in ts_data["time_series"].items():
                 data[key] = value
             
+            
             # Add timesteps info
             if "state_history" in data:
                 data["timesteps"] = len(data["state_history"])

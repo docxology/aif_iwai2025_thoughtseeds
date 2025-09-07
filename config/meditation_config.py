@@ -57,7 +57,7 @@ class DwellTimeConfig:
             breath_control=(15, 25),
             mind_wandering=(8, 12),
             meta_awareness=(1, 3),
-            redirect_breath=(1, 3)
+            redirect_breath=(3, 7)  # Longer than novice (2, 5)
         )
 
 @dataclass
@@ -76,6 +76,39 @@ class NetworkProfile:
     VAN: float
     DAN: float
     FPN: float
+    
+    def copy(self):
+        """Create a copy of this NetworkProfile"""
+        return NetworkProfile(DMN=self.DMN, VAN=self.VAN, DAN=self.DAN, FPN=self.FPN)
+    
+    def __getitem__(self, key):
+        """Make NetworkProfile subscriptable like a dictionary"""
+        if hasattr(self, key):
+            return getattr(self, key)
+        raise KeyError(f"'{key}' not found in NetworkProfile")
+    
+    def __setitem__(self, key, value):
+        """Make NetworkProfile settable like a dictionary"""
+        if hasattr(self, key):
+            setattr(self, key, value)
+        else:
+            raise KeyError(f"'{key}' not found in NetworkProfile")
+    
+    def __contains__(self, key):
+        """Support 'in' operator"""
+        return hasattr(self, key)
+    
+    def items(self):
+        """Return key-value pairs like a dictionary"""
+        return [('DMN', self.DMN), ('VAN', self.VAN), ('DAN', self.DAN), ('FPN', self.FPN)]
+    
+    def keys(self):
+        """Return keys like a dictionary"""
+        return ['DMN', 'VAN', 'DAN', 'FPN']
+    
+    def values(self):
+        """Return values like a dictionary"""
+        return [self.DMN, self.VAN, self.DAN, self.FPN]
     
 @dataclass
 class NonLinearDynamicsConfig:
@@ -358,35 +391,35 @@ THOUGHTSEED_AGENTS = {
         intentional_weights={"novice": 0.8, "expert": 0.95}, 
         decay_rate=0.005, 
         recovery_rate=0.06
-    ).__dict__,
+    ),
     "pain_discomfort": ThoughtseedAgent(
         id=1, 
         category="distraction", 
         intentional_weights={"novice": 0.4, "expert": 0.6}, 
         decay_rate=0.003, 
         recovery_rate=0.05
-    ).__dict__,
+    ),
     "pending_tasks": ThoughtseedAgent(
         id=2, 
         category="distraction", 
         intentional_weights={"novice": 0.3, "expert": 0.5}, 
         decay_rate=0.002, 
         recovery_rate=0.03
-    ).__dict__,
+    ),
     "self_reflection": ThoughtseedAgent(
         id=3, 
         category="metacognition", 
         intentional_weights={"novice": 0.5, "expert": 0.8}, 
         decay_rate=0.004, 
         recovery_rate=0.04
-    ).__dict__,
+    ),
     "equanimity": ThoughtseedAgent(
         id=4, 
         category="regulation", 
         intentional_weights={"novice": 0.5, "expert": 0.9}, 
         decay_rate=0.001, 
         recovery_rate=0.02
-    ).__dict__
+    )
 }
 
 # Network profiles - align with meditation neuroscience literature 
@@ -397,37 +430,37 @@ THOUGHTSEED_AGENTS = {
 # Meta-awreness and Mind Wandering: Lutz et al., 2015; Christoff et al., 2009; Fox et al., 2015
 NETWORK_PROFILES = {
     "thoughtseed_contributions": {
-        "breath_focus": NetworkProfile(DMN=0.2, VAN=0.3, DAN=0.8, FPN=0.6).__dict__,
-        "pain_discomfort": NetworkProfile(DMN=0.5, VAN=0.7, DAN=0.3, FPN=0.4).__dict__,
-        "pending_tasks": NetworkProfile(DMN=0.8, VAN=0.5, DAN=0.2, FPN=0.4).__dict__,
-        "self_reflection": NetworkProfile(DMN=0.6, VAN=0.4, DAN=0.3, FPN=0.8).__dict__,
-        "equanimity": NetworkProfile(DMN=0.3, VAN=0.3, DAN=0.5, FPN=0.9).__dict__
+        "breath_focus": NetworkProfile(DMN=0.2, VAN=0.3, DAN=0.8, FPN=0.6),
+        "pain_discomfort": NetworkProfile(DMN=0.5, VAN=0.7, DAN=0.3, FPN=0.4),
+        "pending_tasks": NetworkProfile(DMN=0.8, VAN=0.5, DAN=0.2, FPN=0.4),
+        "self_reflection": NetworkProfile(DMN=0.6, VAN=0.4, DAN=0.3, FPN=0.8),
+        "equanimity": NetworkProfile(DMN=0.3, VAN=0.3, DAN=0.5, FPN=0.9)
     },
     
     # State profiles differentiated by experience level
     "state_expected_profiles": {
         # BREATH CONTROL: Experts have lower DMN, higher DAN/FPN
         "breath_control": {
-            "novice": NetworkProfile(DMN=0.35, VAN=0.4, DAN=0.7, FPN=0.5).__dict__,
-            "expert": NetworkProfile(DMN=0.2, VAN=0.4, DAN=0.85, FPN=0.7).__dict__
+            "novice": NetworkProfile(DMN=0.35, VAN=0.4, DAN=0.7, FPN=0.5),
+            "expert": NetworkProfile(DMN=0.2, VAN=0.4, DAN=0.85, FPN=0.7)
         },
         
         # MIND WANDERING: Experts have much lower DMN, higher FPN control
         "mind_wandering": {
-            "novice": NetworkProfile(DMN=0.85, VAN=0.45, DAN=0.2, FPN=0.35).__dict__,
-            "expert": NetworkProfile(DMN=0.65, VAN=0.5, DAN=0.35, FPN=0.55).__dict__
+            "novice": NetworkProfile(DMN=0.85, VAN=0.45, DAN=0.2, FPN=0.35),
+            "expert": NetworkProfile(DMN=0.65, VAN=0.5, DAN=0.35, FPN=0.55)
         },
         
         # META-AWARENESS: Experts have higher VAN (detection) and FPN (control)
         "meta_awareness": {
-            "novice": NetworkProfile(DMN=0.35, VAN=0.7, DAN=0.5, FPN=0.45).__dict__,
-            "expert": NetworkProfile(DMN=0.3, VAN=0.8, DAN=0.6, FPN=0.6).__dict__
+            "novice": NetworkProfile(DMN=0.35, VAN=0.7, DAN=0.5, FPN=0.45),
+            "expert": NetworkProfile(DMN=0.3, VAN=0.8, DAN=0.6, FPN=0.6)
         },
         
         # REDIRECT BREATH: Experts have lower DMN, higher DAN/FPN (control)
         "redirect_breath": {
-            "novice": NetworkProfile(DMN=0.3, VAN=0.45, DAN=0.65, FPN=0.55).__dict__,
-            "expert": NetworkProfile(DMN=0.15, VAN=0.5, DAN=0.8, FPN=0.7).__dict__
+            "novice": NetworkProfile(DMN=0.3, VAN=0.45, DAN=0.65, FPN=0.55),
+            "expert": NetworkProfile(DMN=0.15, VAN=0.5, DAN=0.8, FPN=0.7)
         }
     }
 }
